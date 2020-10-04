@@ -3,7 +3,6 @@ package hu.bme.aut.pugsweeper.view
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.view.MotionEvent
 import android.view.View
 import hu.bme.aut.pugsweeper.R
 
@@ -17,9 +16,9 @@ class PugSweeperView(contex: Context?, attrs: AttributeSet?): View(contex, attrs
         contex?.resources,
         R.drawable.mine)
 
-    var binPic = BitmapFactory.decodeResource(
+    var flagPic = BitmapFactory.decodeResource(
         contex?.resources,
-        R.drawable.bin)
+        R.drawable.flag)
 
     init {
         paintBackground.color = Color.GRAY
@@ -38,8 +37,8 @@ class PugSweeperView(contex: Context?, attrs: AttributeSet?): View(contex, attrs
 
         paintText.textSize = height / 5f
 
-        binPic = Bitmap
-            .createScaledBitmap(binPic, width / 5, height / 5, false)
+        flagPic = Bitmap
+            .createScaledBitmap(flagPic, width / 5, height / 5, false)
         minePic = Bitmap
             .createScaledBitmap(minePic, width / 5, height / 5, false)
     }
@@ -48,6 +47,32 @@ class PugSweeperView(contex: Context?, attrs: AttributeSet?): View(contex, attrs
         super.onDraw(canvas)
 
         canvas?.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paintBackground)
+        drawBoard(canvas);
+    }
+
+    private fun drawBoard(canvas: Canvas?) {
+        val sizeOfGap = (height / 5).toFloat();
+
+        // Board border
+        canvas?.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paintLine)
+
+        // Horizontal lines
+        canvas?.drawLine(0f, sizeOfGap, width.toFloat(), sizeOfGap, paintLine)
+        canvas?.drawLine(0f, 2 * sizeOfGap,
+            width.toFloat(), 2 * sizeOfGap, paintLine)
+        canvas?.drawLine(0f, 3 * sizeOfGap,
+            width.toFloat(), 3 * sizeOfGap, paintLine)
+        canvas?.drawLine(0f, 4 * sizeOfGap,
+            width.toFloat(), 4 * sizeOfGap, paintLine)
+
+        // Vertical lines
+        canvas?.drawLine(sizeOfGap, 0f, sizeOfGap, height.toFloat(), paintLine)
+        canvas?.drawLine(2 * sizeOfGap, 0f,
+            2 * sizeOfGap, height.toFloat(), paintLine)
+        canvas?.drawLine(3 * sizeOfGap, 0f,
+            3 * sizeOfGap, height.toFloat(), paintLine)
+        canvas?.drawLine(4 * sizeOfGap, 0f,
+            4 * sizeOfGap, height.toFloat(), paintLine)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -57,4 +82,29 @@ class PugSweeperView(contex: Context?, attrs: AttributeSet?): View(contex, attrs
         val dim = if (w == 0) h else if (h == 0) w else if (w < h) w else h
         setMeasuredDimension(dim, dim)
     }
+
+    private fun drawFlag(canvas: Canvas?, x: Int, y: Int) {
+        val sizeOfGap = (height / 5);
+        val gapRect = Rect(x * sizeOfGap, y * sizeOfGap,
+            (x + 1) * sizeOfGap, (y + 1) * sizeOfGap)
+
+        canvas?.drawBitmap(flagPic, null, gapRect, null)
+    }
+
+    private fun drawMine(canvas: Canvas?, x: Int, y: Int) {
+        val sizeOfGap = (height / 5);
+        val gapRect = Rect(x * sizeOfGap, y * sizeOfGap,
+            (x + 1) * sizeOfGap, (y + 1) * sizeOfGap)
+
+        canvas?.drawBitmap(minePic, null, gapRect, null)
+    }
+
+    private fun drawNum(canvas: Canvas?, x: Int, y: Int, num: Short) {
+        val sizeOfGap = (height / 5).toFloat();
+        val sizeOfPadding = 20;
+
+        canvas?.drawText(num.toString(), x * sizeOfGap + sizeOfPadding,
+            (y + 1) * sizeOfGap - sizeOfPadding, paintText)
+    }
+
 }

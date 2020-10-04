@@ -23,20 +23,26 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:gravity="center_horizontal"
+                    android:textSize="24sp"
                     android:text="BOMBS" />
 
             <Button
                     android:id="@+id/pugButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="112dp"
+                    android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:text="Restart" />
+                    android:background="@drawable/pug" />
 
             <TextView
                     android:id="@+id/elapsTimeTxt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:gravity="center_horizontal"
+                    android:textSize="24sp"
                     android:text="TIME" />
         </LinearLayout>
 
