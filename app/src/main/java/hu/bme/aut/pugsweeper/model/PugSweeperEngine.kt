@@ -1,18 +1,19 @@
 package hu.bme.aut.pugsweeper.model
 
 import android.util.Log
+import androidx.databinding.Bindable
+import hu.bme.aut.pugsweeper.MainActivity
 
-object Engine {
+ object PugSweeperEngine {
     val UNREVEALED : Short = -3
     val FLAG : Short = -2
     val BOMB : Short = -1
     val EMPTY : Short = 0
 
     var revealedMines = 0
+    var gridSize = 0
 
     private var mineInGame = 0
-    private var gridSize = 0
-
     private var isFlagMode = false
     private var isEndGame = false
     private var isWin = false
@@ -20,10 +21,13 @@ object Engine {
     private var scoreGrid = arrayOf<Array<Short>>()
     private var revealedGrid = arrayOf<Array<Short>>()
 
+     private lateinit var context: MainActivity
+
     // Initialize grid with empty fields
-    fun initGame(_bombNumber: Int, _gridSize: Int) {
+    fun initGame(_bombNumber: Int, _gridSize: Int, _context: MainActivity) {
         mineInGame = _bombNumber
         gridSize = _gridSize
+        context = _context
 
         // Init Grids
         for (i in 0 until gridSize) {
@@ -41,7 +45,7 @@ object Engine {
         }
 
         for (i in 0 until gridSize) {
-            Log.d("[GRID INIT]", scoreGrid[i].joinToString(",", "[", "]"));
+            Log.d("[GRID INIT]", scoreGrid[i].joinToString(",", "[", "]"))
         }
     }
 
@@ -76,10 +80,14 @@ object Engine {
             return
         }
 
+        if(revealedGrid[x][y] != UNREVEALED) {
+            return
+        }
+
         if(!isFlagMode) {
             if(scoreGrid[x][y] == BOMB) {
                 revealedGrid[x][y] = BOMB;
-                isEndGame = true;
+                isEndGame = true
                 return
             }
 
@@ -104,6 +112,7 @@ object Engine {
             if(scoreGrid[x][y] == BOMB) {
                 revealedGrid[x][y] = FLAG
                 revealedMines++
+                context.updateText()
 
                 if (revealedMines == mineInGame) {
                     isEndGame = true
@@ -114,7 +123,7 @@ object Engine {
                 Log.d("[FLAG PLACING]", "Flag placed on bomb"
                         + isWin.toString())
             } else {
-                revealedGrid[x][y] = BOMB
+                revealedGrid[x][y] = FLAG
                 isEndGame = true
                 Log.d("[FLAG PLACING]", "Flag placend else, game end: "
                         + isEndGame.toString())

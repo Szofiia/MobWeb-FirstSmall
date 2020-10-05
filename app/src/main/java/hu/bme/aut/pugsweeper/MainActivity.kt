@@ -2,40 +2,89 @@ package hu.bme.aut.pugsweeper
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.databinding.DataBindingUtil
 import com.google.android.material.snackbar.Snackbar
-import hu.bme.aut.pugsweeper.model.Engine
+import hu.bme.aut.pugsweeper.databinding.ActivityMainBinding
+import hu.bme.aut.pugsweeper.model.PugSweeperEngine
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
+    private val bombsCount = 3
+    private val gridSize = 5
+    private var elapsedTime = 0
+    private var elapsedTimer: Timer? = null
+    private lateinit var binding: ActivityMainBinding
 
-    val bombsCount = 3
-    val gridSize = 5
-        get() = field
+    inner class GameTimerTask : TimerTask() {
+        override fun run() {
+            runOnUiThread {
+                elapsedTime++
+                elapsTimeTxt.text = elapsedTime.toString()
+
+                if(elapsedTime >= 300 || PugSweeperEngine.getEndGame()) {
+                    stopTimer()
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        Engine.initGame(bombsCount, gridSize);
-        Engine.resetGame();
-        remainingBombTxt.text = (bombsCount - Engine.revealedMines).toString()
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        pugButton.setOnClickListener{
-            Engine.resetGame()
-            pugSweeperView.invalidate()
-            Snackbar.make(pugSweeperContainer, "Your game restarted!", Snackbar.LENGTH_LONG).show()
+        PugSweeperEngine.initGame(bombsCount, gridSize, this)
+        PugSweeperEngine.resetGame()
+
+        remainingBombTxt.text = (bombsCount - PugSweeperEngine.revealedMines).toString()
+        elapsTimeTxt.text = "0"
+
+        if(elapsedTimer == null) {
+            elapsedTimer = Timer()
+            elapsedTimer?.schedule(GameTimerTask(), 1000, 1000)
         }
 
-        flagSwitch.setOnCheckedChangeListener { _, isChecked ->
+       // Pug button restarts the game
+        binding.pugButton.setOnClickListener{
+            PugSweeperEngine.resetGame()
+            pugSweeperView.invalidate()
+
+            remainingBombTxt.text = (bombsCount - PugSweeperEngine.revealedMines).toString()
+            elapsTimeTxt.text = "0"
+            restartTimer()
+
+            Snackbar.make(pugSweeperContainer, "Your game restarted!",
+                Snackbar.LENGTH_LONG).show()
+        }
+
+        // Switch switches flag or try mode
+        binding.flagSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                Engine.setFlagMode(true)
-                Snackbar.make(pugSweeperContainer, "You are placing flags!", Snackbar.LENGTH_LONG).show()
+                PugSweeperEngine.setFlagMode(true)
+                Snackbar.make(pugSweeperContainer, "You are placing flags!",
+                    Snackbar.LENGTH_LONG).show()
             }
             else {
-                Engine.setFlagMode(false)
-                Snackbar.make(pugSweeperContainer, "You are trying fields!", Snackbar.LENGTH_LONG).show()
+                PugSweeperEngine.setFlagMode(false)
+                Snackbar.make(pugSweeperContainer, "You are trying fields!",
+                    Snackbar.LENGTH_LONG).show()
             }
         }
-
     }
 
+    fun updateText() {
+        remainingBombTxt.text = (bombsCount - PugSweeperEngine.revealedMines).toString()
+    }
+
+    private fun restartTimer() {
+        stopTimer()
+        elapsedTimer = Timer()
+        elapsedTimer?.schedule(GameTimerTask(), 1000, 1000)
+    }
+
+    private fun stopTimer() {
+        elapsedTime = 0
+        elapsedTimer?.cancel()
+        elapsedTimer = null
+    }
 }
