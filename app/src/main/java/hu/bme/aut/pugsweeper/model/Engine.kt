@@ -8,21 +8,21 @@ object Engine {
     val BOMB : Short = -1
     val EMPTY : Short = 0
 
-    var revealedBombs = 0
+    var revealedMines = 0
 
-    private var scoreGrid = arrayOf<Array<Short>>()
-    private var revealedGrid = arrayOf<Array<Short>>()
-
-    private var bombNumber = 0
+    private var mineInGame = 0
     private var gridSize = 0
 
     private var isFlagMode = false
     private var isEndGame = false
     private var isWin = false
 
+    private var scoreGrid = arrayOf<Array<Short>>()
+    private var revealedGrid = arrayOf<Array<Short>>()
+
     // Initialize grid with empty fields
-    fun init(_bombNumber: Int, _gridSize: Int) {
-        bombNumber = _bombNumber
+    fun initGame(_bombNumber: Int, _gridSize: Int) {
+        mineInGame = _bombNumber
         gridSize = _gridSize
 
         // Init Grids
@@ -46,8 +46,16 @@ object Engine {
     }
 
     // Reset grid with a number of random bombs
-    fun resetGrid() {
-        calculateBombs();
+    fun resetGame() {
+        isEndGame = false
+        isWin = false
+        revealedMines = 0
+
+        Log.d("[RESET]", "revealedBombs: $revealedMines, "
+                + "bombNumber: $mineInGame, gridSize: $gridSize, "
+                + "isEndGame: $isEndGame, isFlagMode: $isFlagMode")
+        emptyGrid()
+        calculateMines()
 
         for (i in 0 until gridSize) {
             for (j in 0 until gridSize) {
@@ -60,41 +68,34 @@ object Engine {
             Log.d("[GRID RESET: GRID]", scoreGrid[i].joinToString(",", "[", "]"))
             Log.d("[GRID RESET: REVEALED]", revealedGrid[i].joinToString(",", "[", "]"))
         }
-
-        isEndGame = false
-        revealedBombs = 0
-
-        Log.d("[GAME RESET]", " Game end: $isEndGame Bombs: $revealedBombs")
-
-        isEndGame = false
-        isWin = false
     }
 
+    // Reveal field when View touch event calls
     fun revealField(x: Int, y: Int) {
         if(x < 0 || y < 0 || x >= gridSize || y >= gridSize) {
-            return;
+            return
         }
 
         if(!isFlagMode) {
             if(scoreGrid[x][y] == BOMB) {
                 revealedGrid[x][y] = BOMB;
                 isEndGame = true;
-                return;
+                return
             }
 
             if (scoreGrid[x][y] == EMPTY) {
-                revealedGrid[x][y] = scoreGrid[x][y];
-                revealEmptyField(x-1,y-1);
-                revealEmptyField(x-1,y);
-                revealEmptyField(x-1,y+1);
+                revealedGrid[x][y] = scoreGrid[x][y]
+                revealEmptyField(x-1,y-1)
+                revealEmptyField(x-1,y)
+                revealEmptyField(x-1,y+1)
 
-                revealEmptyField(x,y-1);
-                revealEmptyField(x,y+1);
+                revealEmptyField(x,y-1)
+                revealEmptyField(x,y+1)
 
-                revealEmptyField(x+1,y-1);
-                revealEmptyField(x+1,y);
-                revealEmptyField(x+1,y+1);
-                return;
+                revealEmptyField(x+1,y-1)
+                revealEmptyField(x+1,y)
+                revealEmptyField(x+1,y+1)
+                return
             }
 
             revealedGrid[x][y] = scoreGrid[x][y]
@@ -102,9 +103,9 @@ object Engine {
             // If placing flags is on
             if(scoreGrid[x][y] == BOMB) {
                 revealedGrid[x][y] = FLAG
-                revealedBombs++
+                revealedMines++
 
-                if (revealedBombs == bombNumber) {
+                if (revealedMines == mineInGame) {
                     isEndGame = true
                     isWin = true
                     Log.d("[FLAG PLACING]", "Game won:")
@@ -121,47 +122,29 @@ object Engine {
         }
     }
 
-    fun revealEmptyField(x: Int, y: Int){
-        if(x < 0 || y < 0 || x >= gridSize || y >= gridSize) {
-            return;
-        }
+    // Public getters and setters
+    fun getFlagMode() = isFlagMode
 
-        if(revealedGrid[x][y] != UNREVEALED){
-            return
-        }
-
-        if(scoreGrid[x][y] == BOMB) {
-            return;
-        }
-
-        if (scoreGrid[x][y] == EMPTY) {
-            revealedGrid[x][y] = scoreGrid[x][y];
-            revealEmptyField(x-1,y-1);
-            revealEmptyField(x-1,y);
-            revealEmptyField(x-1,y+1);
-
-            revealEmptyField(x,y-1);
-            revealEmptyField(x,y+1);
-
-            revealEmptyField(x+1,y-1);
-            revealEmptyField(x+1,y);
-            revealEmptyField(x+1,y+1);
-            return;
-        }
-
-        revealedGrid[x][y] = scoreGrid[x][y];
+    fun setFlagMode(mode: Boolean){
+        isFlagMode = mode
     }
 
-    fun flagFiled(x: Int, y: Int) {
-        if(scoreGrid[x][y] != BOMB) {
-            isEndGame = true;
-            return;
+    fun getRevealedFields() = revealedGrid
+
+    fun getEndGame() = isEndGame
+
+    fun getWin() = isWin
+
+    private fun emptyGrid() {
+        for (i in 0 until gridSize) {
+            for (j in 0 until gridSize) {
+                scoreGrid[i][j] = EMPTY
+            }
         }
-        revealedBombs++;
     }
 
-    private fun calculateBombs() {
-        var bombsToPlace = bombNumber;
+    private fun calculateMines() {
+        var bombsToPlace = mineInGame
         while(bombsToPlace > 0) {
             val bX = (0 until gridSize).random()
             val bY = (0 until gridSize).random()
@@ -173,13 +156,12 @@ object Engine {
         }
     }
 
-    // Calculates a field's value of x,y coordinates
     private fun calculateField(x: Int, y: Int): Short {
         if (scoreGrid[x][y] == BOMB) {
             return BOMB
         }
 
-        var bombsAround = 0;
+        var bombsAround = 0
 
         if(isMine(x-1, y-1)) { bombsAround++ }
         if(isMine(x-1, y)) { bombsAround++ }
@@ -195,6 +177,37 @@ object Engine {
         return bombsAround.toShort()
     }
 
+    private fun revealEmptyField(x: Int, y: Int){
+        if(x < 0 || y < 0 || x >= gridSize || y >= gridSize) {
+            return
+        }
+
+        if(revealedGrid[x][y] != UNREVEALED){
+            return
+        }
+
+        if(scoreGrid[x][y] == BOMB) {
+            return
+        }
+
+        if (scoreGrid[x][y] == EMPTY) {
+            revealedGrid[x][y] = scoreGrid[x][y]
+            revealEmptyField(x-1,y-1)
+            revealEmptyField(x-1,y)
+            revealEmptyField(x-1,y+1)
+
+            revealEmptyField(x,y-1)
+            revealEmptyField(x,y+1)
+
+            revealEmptyField(x+1,y-1)
+            revealEmptyField(x+1,y)
+            revealEmptyField(x+1,y+1)
+            return
+        }
+
+        revealedGrid[x][y] = scoreGrid[x][y]
+    }
+
     private fun isMine(x: Int, y: Int): Boolean{
         if(x >= 0 && y >= 0 && x < gridSize && y < gridSize) {
             if(scoreGrid[x][y] == BOMB) {
@@ -203,17 +216,5 @@ object Engine {
         }
         return false
     }
-
-    fun getFlagMode() = isFlagMode
-
-    fun setFlagMode(mode: Boolean){
-        isFlagMode = mode
-    }
-
-    fun getRevealedFields() = revealedGrid
-
-    fun getEndGame() = isEndGame
-
-    fun getWin() = isWin
 }
 

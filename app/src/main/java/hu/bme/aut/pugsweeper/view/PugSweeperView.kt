@@ -14,6 +14,7 @@ class PugSweeperView(contex: Context?, attrs: AttributeSet?): View(contex, attrs
 
     var paintBackground = Paint()
     var paintEndBackground = Paint()
+    var paintEmpty = Paint()
     var paintLine = Paint()
     var paintText = Paint()
 
@@ -30,6 +31,9 @@ class PugSweeperView(contex: Context?, attrs: AttributeSet?): View(contex, attrs
     init {
         paintBackground.color = Color.GRAY
         paintBackground.style = Paint.Style.FILL
+
+        paintEmpty.color = Color.RED
+        paintEmpty.style = Paint.Style.FILL
 
         paintEndBackground.color = Color.argb(200,100,100,100)
         paintEndBackground.style = Paint.Style.FILL
@@ -74,49 +78,29 @@ class PugSweeperView(contex: Context?, attrs: AttributeSet?): View(contex, attrs
     }
 
     private fun drawBoard(canvas: Canvas?, currentState: Array<Array<Short>>?) {
+        drawEmptyBoard(canvas)
+
+        if(currentState == null) {
+            return
+        }
+
+        for (i in 0 until 5) {
+            Log.d("[DRAW STATE]", currentState[i].joinToString(",", "[", "]"))
+        }
+
         val sizeOfGap = (height / 5).toFloat();
-
-        // Board border
-        canvas?.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paintLine)
-
-        // Horizontal lines
-        canvas?.drawLine(0f, sizeOfGap, width.toFloat(), sizeOfGap, paintLine)
-        canvas?.drawLine(0f, 2 * sizeOfGap,
-            width.toFloat(), 2 * sizeOfGap, paintLine)
-        canvas?.drawLine(0f, 3 * sizeOfGap,
-            width.toFloat(), 3 * sizeOfGap, paintLine)
-        canvas?.drawLine(0f, 4 * sizeOfGap,
-            width.toFloat(), 4 * sizeOfGap, paintLine)
-
-        // Vertical lines
-        canvas?.drawLine(sizeOfGap, 0f, sizeOfGap, height.toFloat(), paintLine)
-        canvas?.drawLine(2 * sizeOfGap, 0f,
-            2 * sizeOfGap, height.toFloat(), paintLine)
-        canvas?.drawLine(3 * sizeOfGap, 0f,
-            3 * sizeOfGap, height.toFloat(), paintLine)
-        canvas?.drawLine(4 * sizeOfGap, 0f,
-            4 * sizeOfGap, height.toFloat(), paintLine)
-
-//        if(currentState != null) {
-//            for (i in 0 until 5) {
-//                for (j in 0 until 5) {
-//                    when(currentState[i][j]) {
-//                        Engine.EMPTY ->
-//                            canvas?.drawRect(j * sizeOfGap, i * sizeOfGap,
-//                                sizeOfGap, sizeOfGap, paintLine)
-//                        Engine.FLAG -> drawFlag(canvas, j, i)
-//                        Engine.BOMB -> drawMine(canvas, j, i)
-//                        Engine.UNREVEALED ->
-//                            canvas?.drawRect(j * sizeOfGap, i * sizeOfGap,
-//                                sizeOfGap, sizeOfGap, paintBackground)
-//                        else -> {
-//                            drawNum(canvas, j, i, currentState[i][j])
-//                        }
-//                    }
-//
-//                }
-//            }
-//        }
+        for (i in 0 until 5) {
+            for (j in 0 until 5) {
+                when(currentState[i][j]) {
+                    Engine.EMPTY -> canvas?.drawRect(j * sizeOfGap, i * sizeOfGap,
+                        (j + 1) * sizeOfGap, (i + 1) * sizeOfGap, paintBackground)
+                    Engine.FLAG -> drawFlag(canvas, j, i)
+                    Engine.BOMB -> drawMine(canvas, j, i)
+                    Engine.UNREVEALED -> {}
+                    else -> drawNum(canvas, j, i, currentState[i][j])
+                }
+            }
+        }
 
         // Detect if game ends
         if(Engine.getEndGame()) {
@@ -174,4 +158,32 @@ class PugSweeperView(contex: Context?, attrs: AttributeSet?): View(contex, attrs
         return true
     }
 
+    fun drawEmptyBoard(canvas: Canvas?) {
+        val sizeOfGap = (height / 5).toFloat();
+
+        // Board border
+        canvas?.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paintLine)
+
+        // Horizontal lines
+        canvas?.drawLine(0f, sizeOfGap, width.toFloat(), sizeOfGap, paintLine)
+        canvas?.drawLine(0f, 2 * sizeOfGap,
+            width.toFloat(), 2 * sizeOfGap, paintLine)
+        canvas?.drawLine(0f, 3 * sizeOfGap,
+            width.toFloat(), 3 * sizeOfGap, paintLine)
+        canvas?.drawLine(0f, 4 * sizeOfGap,
+            width.toFloat(), 4 * sizeOfGap, paintLine)
+
+        // Vertical lines
+        canvas?.drawLine(sizeOfGap, 0f, sizeOfGap, height.toFloat(), paintLine)
+        canvas?.drawLine(2 * sizeOfGap, 0f,
+            2 * sizeOfGap, height.toFloat(), paintLine)
+        canvas?.drawLine(3 * sizeOfGap, 0f,
+            3 * sizeOfGap, height.toFloat(), paintLine)
+        canvas?.drawLine(4 * sizeOfGap, 0f,
+            4 * sizeOfGap, height.toFloat(), paintLine)
+    }
+
+    fun restart() {
+        invalidate()
+    }
 }

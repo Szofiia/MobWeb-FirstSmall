@@ -50,7 +50,7 @@
                 android:layout_height="match_parent">
 
             <hu.bme.aut.pugsweeper.view.PugSweeperView
-                    android:id="@+id/sweeperGameView"
+                    android:id="@+id/pugSweeperView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent"

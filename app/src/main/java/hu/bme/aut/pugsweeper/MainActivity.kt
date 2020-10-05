@@ -2,13 +2,9 @@ package hu.bme.aut.pugsweeper
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.MotionEvent
 import com.google.android.material.snackbar.Snackbar
 import hu.bme.aut.pugsweeper.model.Engine
-import hu.bme.aut.pugsweeper.view.PugSweeperView
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main.view.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -19,12 +15,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Engine.init(bombsCount, gridSize);
-        Engine.resetGrid();
-        remainingBombTxt.text = (bombsCount - Engine.revealedBombs).toString()
+        Engine.initGame(bombsCount, gridSize);
+        Engine.resetGame();
+        remainingBombTxt.text = (bombsCount - Engine.revealedMines).toString()
 
         pugButton.setOnClickListener{
-            Engine.resetGrid()
+            Engine.resetGame()
+            pugSweeperView.invalidate()
             Snackbar.make(pugSweeperContainer, "Your game restarted!", Snackbar.LENGTH_LONG).show()
         }
 
