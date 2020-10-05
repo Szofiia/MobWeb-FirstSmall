@@ -96,6 +96,40 @@ class PugSweeperView(contex: Context?, attrs: AttributeSet?): View(contex, attrs
             3 * sizeOfGap, height.toFloat(), paintLine)
         canvas?.drawLine(4 * sizeOfGap, 0f,
             4 * sizeOfGap, height.toFloat(), paintLine)
+
+//        if(currentState != null) {
+//            for (i in 0 until 5) {
+//                for (j in 0 until 5) {
+//                    when(currentState[i][j]) {
+//                        Engine.EMPTY ->
+//                            canvas?.drawRect(j * sizeOfGap, i * sizeOfGap,
+//                                sizeOfGap, sizeOfGap, paintLine)
+//                        Engine.FLAG -> drawFlag(canvas, j, i)
+//                        Engine.BOMB -> drawMine(canvas, j, i)
+//                        Engine.UNREVEALED ->
+//                            canvas?.drawRect(j * sizeOfGap, i * sizeOfGap,
+//                                sizeOfGap, sizeOfGap, paintBackground)
+//                        else -> {
+//                            drawNum(canvas, j, i, currentState[i][j])
+//                        }
+//                    }
+//
+//                }
+//            }
+//        }
+
+        // Detect if game ends
+        if(Engine.getEndGame()) {
+            canvas?.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paintEndBackground)
+            if(Engine.getWin()) {
+                canvas?.drawText("You Won!", 0f, 120f, paintText)
+
+                canvas?.drawText("Made by", 0f, 240f, paintText)
+                canvas?.drawText("D0EXP2, Zsófia Kecskés-Solymosi", 0f, 320f, paintText)
+                return;
+            }
+            canvas?.drawText("You Lost!", 0f, 120f, paintText)
+        }
     }
 
     private fun drawFlag(canvas: Canvas?, x: Int, y: Int) {
