@@ -19,7 +19,7 @@
                 android:orientation="horizontal">
 
             <TextView
-                    android:id="@+id/remaininBombTxt"
+                    android:id="@+id/remainingBombTxt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -30,9 +30,8 @@
 
             <Button
                     android:id="@+id/pugButton"
-                    android:layout_height="112dp"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_width="56dp"
+                    android:layout_height="64dp"
                     android:background="@drawable/pug" />
 
             <TextView
@@ -46,10 +45,29 @@
                     android:text="TIME" />
         </LinearLayout>
 
-        <hu.bme.aut.pugsweeper.view.PugSweeperView
-                android:id="@+id/sweeperGameView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            <hu.bme.aut.pugsweeper.view.PugSweeperView
+                    android:id="@+id/sweeperGameView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            <Switch
+                    android:id="@+id/flagSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Switch right to place flags"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/sweeperGameView"
+                    app:layout_constraintVertical_bias="0.0"
+                    tools:layout_editor_absoluteX="0dp" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 

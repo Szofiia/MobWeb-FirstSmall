@@ -1,26 +1,30 @@
 package hu.bme.aut.pugsweeper.model
 
 import android.util.Log
-import kotlin.random.Random
 
-class Engine {
+object Engine {
     val UNREVEALED : Short = -3
     val FLAG : Short = -2
     val BOMB : Short = -1
     val EMPTY : Short = 0
 
+    var revealedBombs = 0
+
     private var scoreGrid = arrayOf<Array<Short>>()
     private var revealedGrid = arrayOf<Array<Short>>()
 
-    private var bombNumber = 3
-    private val gridSize = 5
-    private var revealedBombs = 0
+    private var bombNumber = 0
+    private var gridSize = 0
 
     private var isFlagMode = false
     private var isEndGame = false
+    private var isWin = false
 
     // Initialize grid with empty fields
-    constructor() {
+    fun init(_bombNumber: Int, _gridSize: Int) {
+        bombNumber = _bombNumber
+        gridSize = _gridSize
+
         // Init Grids
         for (i in 0 until gridSize) {
             var gridRow = arrayOf<Short>()
@@ -31,6 +35,9 @@ class Engine {
             }
             scoreGrid += gridRow
             revealedGrid += revealedRow
+
+            isEndGame = false
+            isWin = false
         }
 
         for (i in 0 until gridSize) {
@@ -59,38 +66,86 @@ class Engine {
 
         Log.d("[GAME RESET]", " Game end: $isEndGame Bombs: $revealedBombs")
 
+        isEndGame = false
+        isWin = false
     }
 
-    // Handle flag and reveal mode
-    fun toggleSwitch() {
-        if(!isFlagMode) {
-            isFlagMode = true;
+    fun revealField(x: Int, y: Int) {
+        if(x < 0 || y < 0 || x >= gridSize || y >= gridSize) {
             return;
         }
-        isFlagMode = true;
+
+        if(!isFlagMode) {
+            if(scoreGrid[x][y] == BOMB) {
+                revealedGrid[x][y] = BOMB;
+                isEndGame = true;
+                return;
+            }
+
+            if (scoreGrid[x][y] == EMPTY) {
+                revealedGrid[x][y] = scoreGrid[x][y];
+                revealEmptyField(x-1,y-1);
+                revealEmptyField(x-1,y);
+                revealEmptyField(x-1,y+1);
+
+                revealEmptyField(x,y-1);
+                revealEmptyField(x,y+1);
+
+                revealEmptyField(x+1,y-1);
+                revealEmptyField(x+1,y);
+                revealEmptyField(x+1,y+1);
+                return;
+            }
+
+            revealedGrid[x][y] = scoreGrid[x][y]
+        } else {
+            // If placing flags is on
+            if(scoreGrid[x][y] == BOMB) {
+                revealedGrid[x][y] = FLAG
+                revealedBombs++
+
+                if (revealedBombs == bombNumber) {
+                    isEndGame = true
+                    isWin = true
+                    Log.d("[FLAG PLACING]", "Game won:")
+                }
+
+                Log.d("[FLAG PLACING]", "Flag placed on bomb"
+                        + isWin.toString())
+            } else {
+                revealedGrid[x][y] = BOMB
+                isEndGame = true
+                Log.d("[FLAG PLACING]", "Flag placend else, game end: "
+                        + isEndGame.toString())
+            }
+        }
     }
 
-    fun revealField(x: Int, y: Int){
-        if(x < 0 && y < 0 && x >= gridSize && y >= gridSize) {
+    fun revealEmptyField(x: Int, y: Int){
+        if(x < 0 || y < 0 || x >= gridSize || y >= gridSize) {
             return;
+        }
+
+        if(revealedGrid[x][y] != UNREVEALED){
+            return
         }
 
         if(scoreGrid[x][y] == BOMB) {
-            isEndGame = true;
             return;
         }
 
         if (scoreGrid[x][y] == EMPTY) {
-            revealField(x-1,y-1);
-            revealField(x-1,y);
-            revealField(x-1,y+1);
+            revealedGrid[x][y] = scoreGrid[x][y];
+            revealEmptyField(x-1,y-1);
+            revealEmptyField(x-1,y);
+            revealEmptyField(x-1,y+1);
 
-            revealField(x,y-1);
-            revealField(x,y+1);
+            revealEmptyField(x,y-1);
+            revealEmptyField(x,y+1);
 
-            revealField(x+1,y-1);
-            revealField(x+1,y);
-            revealField(x+1,y+1);
+            revealEmptyField(x+1,y-1);
+            revealEmptyField(x+1,y);
+            revealEmptyField(x+1,y+1);
             return;
         }
 
@@ -106,13 +161,14 @@ class Engine {
     }
 
     private fun calculateBombs() {
-        while(bombNumber > 0) {
+        var bombsToPlace = bombNumber;
+        while(bombsToPlace > 0) {
             val bX = (0 until gridSize).random()
             val bY = (0 until gridSize).random()
 
             if(scoreGrid[bX][bY] != BOMB) {
                 scoreGrid[bX][bY] = BOMB
-                bombNumber--
+                bombsToPlace--
             }
         }
     }
@@ -147,4 +203,17 @@ class Engine {
         }
         return false
     }
+
+    fun getFlagMode() = isFlagMode
+
+    fun setFlagMode(mode: Boolean){
+        isFlagMode = mode
+    }
+
+    fun getRevealedFields() = revealedGrid
+
+    fun getEndGame() = isEndGame
+
+    fun getWin() = isWin
 }
+

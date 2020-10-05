@@ -3,12 +3,17 @@ package hu.bme.aut.pugsweeper.view
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.util.Log
+import android.view.MotionEvent
 import android.view.View
+import hu.bme.aut.pugsweeper.MainActivity
 import hu.bme.aut.pugsweeper.R
+import hu.bme.aut.pugsweeper.model.Engine
 
 class PugSweeperView(contex: Context?, attrs: AttributeSet?): View(contex, attrs) {
 
     var paintBackground = Paint()
+    var paintEndBackground = Paint()
     var paintLine = Paint()
     var paintText = Paint()
 
@@ -20,9 +25,14 @@ class PugSweeperView(contex: Context?, attrs: AttributeSet?): View(contex, attrs
         contex?.resources,
         R.drawable.flag)
 
+    var currentState: Array<Array<Short>> = Engine.getRevealedFields()
+
     init {
         paintBackground.color = Color.GRAY
         paintBackground.style = Paint.Style.FILL
+
+        paintEndBackground.color = Color.argb(200,100,100,100)
+        paintEndBackground.style = Paint.Style.FILL
 
         paintLine.color = Color.WHITE
         paintLine.style = Paint.Style.STROKE
@@ -47,10 +57,23 @@ class PugSweeperView(contex: Context?, attrs: AttributeSet?): View(contex, attrs
         super.onDraw(canvas)
 
         canvas?.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paintBackground)
-        drawBoard(canvas);
+        if(currentState.isEmpty()) {
+            drawBoard(canvas, null)
+        }
+        else {
+            drawBoard(canvas, currentState)
+        }
     }
 
-    private fun drawBoard(canvas: Canvas?) {
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val w = View.MeasureSpec.getSize(widthMeasureSpec)
+        val h = View.MeasureSpec.getSize(heightMeasureSpec)
+
+        val dim = if (w == 0) h else if (h == 0) w else if (w < h) w else h
+        setMeasuredDimension(dim, dim)
+    }
+
+    private fun drawBoard(canvas: Canvas?, currentState: Array<Array<Short>>?) {
         val sizeOfGap = (height / 5).toFloat();
 
         // Board border
@@ -75,14 +98,6 @@ class PugSweeperView(contex: Context?, attrs: AttributeSet?): View(contex, attrs
             4 * sizeOfGap, height.toFloat(), paintLine)
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val w = View.MeasureSpec.getSize(widthMeasureSpec)
-        val h = View.MeasureSpec.getSize(heightMeasureSpec)
-
-        val dim = if (w == 0) h else if (h == 0) w else if (w < h) w else h
-        setMeasuredDimension(dim, dim)
-    }
-
     private fun drawFlag(canvas: Canvas?, x: Int, y: Int) {
         val sizeOfGap = (height / 5);
         val gapRect = Rect(x * sizeOfGap, y * sizeOfGap,
@@ -105,6 +120,24 @@ class PugSweeperView(contex: Context?, attrs: AttributeSet?): View(contex, attrs
 
         canvas?.drawText(num.toString(), x * sizeOfGap + sizeOfPadding,
             (y + 1) * sizeOfGap - sizeOfPadding, paintText)
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event?.action == MotionEvent.ACTION_DOWN) {
+            Log.d("[TOUCHEVENT]", "I touched the screen" + Engine.getFlagMode().toString())
+
+            val touchX = event.x.toInt() / (width / 5)
+            val touchY = event.y.toInt() / (height / 5)
+
+            Engine.revealField(touchY, touchX)
+            currentState = Engine.getRevealedFields()
+            for (i in 0 until 5) {
+                Log.d("[GRID RESET: GRID]", currentState[i].joinToString(",", "[", "]"))
+            }
+
+            invalidate()
+        }
+        return true
     }
 
 }
