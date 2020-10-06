@@ -1,14 +1,11 @@
 package hu.bme.aut.pugsweeper.view
 
-import android.app.Activity
 import android.content.Context
-import android.content.ContextWrapper
 import android.graphics.*
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import hu.bme.aut.pugsweeper.MainActivity
 import hu.bme.aut.pugsweeper.R
 import hu.bme.aut.pugsweeper.model.PugSweeperEngine
 
@@ -18,7 +15,8 @@ class PugSweeperView(context: Context?, attrs: AttributeSet?): View(context, att
     private var endBackgroundPaint = Paint()
     private var emptyFieldPaint = Paint()
     private var linePaint = Paint()
-    private var textPaint = Paint()
+    private var titlePaint = Paint()
+    private var subTitlePaint = Paint()
 
     private var minePic = BitmapFactory.decodeResource(
         context?.resources,
@@ -32,27 +30,31 @@ class PugSweeperView(context: Context?, attrs: AttributeSet?): View(context, att
     private var currentState: Array<Array<Short>> = PugSweeperEngine.getRevealedFields()
 
     init {
-        backgroundPaint.color = Color.GRAY
+        backgroundPaint.color = Color.parseColor("#FEDBD0")
         backgroundPaint.style = Paint.Style.FILL
 
-        emptyFieldPaint.color = Color.RED
+        emptyFieldPaint.color = Color.parseColor("#FBB8AC")
         emptyFieldPaint.style = Paint.Style.FILL
 
         endBackgroundPaint.color = Color.argb(200,100,100,100)
         endBackgroundPaint.style = Paint.Style.FILL
 
-        linePaint.color = Color.WHITE
+        linePaint.color = Color.parseColor("#FBB8AC")
         linePaint.style = Paint.Style.STROKE
         linePaint.strokeWidth = gridSize.toFloat()
 
-        textPaint.color = Color.BLACK
-        textPaint.textSize = 60f
+        titlePaint.color = Color.WHITE
+        titlePaint.textSize = height / gridSize.toFloat()
+
+        subTitlePaint.color = Color.WHITE
+        subTitlePaint.textSize = 48f
+
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
 
-        textPaint.textSize = height / gridSize.toFloat()
+        titlePaint.textSize = height / gridSize.toFloat()
 
         flagPic = Bitmap
             .createScaledBitmap(flagPic, width / gridSize, height / gridSize, false)
@@ -86,67 +88,12 @@ class PugSweeperView(context: Context?, attrs: AttributeSet?): View(context, att
         if(currentState == null) {
             return
         }
-
-        for (i in 0 until gridSize) {
-            Log.d("[DRAW STATE]", currentState[i].joinToString(",", "[", "]"))
-        }
-
-        val sizeOfGap = (height / gridSize).toFloat();
-        for (i in 0 until gridSize) {
-            for (j in 0 until gridSize) {
-                when(currentState[i][j]) {
-                    PugSweeperEngine.EMPTY -> canvas?.drawRect(j * sizeOfGap, i * sizeOfGap,
-                        (j + 1) * sizeOfGap, (i + 1) * sizeOfGap, backgroundPaint)
-                    PugSweeperEngine.FLAG -> drawFlag(canvas, j, i)
-                    PugSweeperEngine.BOMB -> drawMine(canvas, j, i)
-                    PugSweeperEngine.UNREVEALED -> {}
-                    else -> drawNum(canvas, j, i, currentState[i][j])
-                }
-            }
-        }
-
-        // Detect if game ends
-        if(PugSweeperEngine.getEndGame()) {
-            canvas?.drawRect(0f, 0f, width.toFloat(), height.toFloat(), endBackgroundPaint)
-            if(PugSweeperEngine.getWin()) {
-                canvas?.drawText("You Won!", 0f, 120f, textPaint)
-
-                canvas?.drawText("Made by", 0f, 240f, textPaint)
-                canvas?.drawText("D0EXP2, Zsófia Kecskés-Solymosi", 0f, 320f, textPaint)
-                return;
-            }
-            canvas?.drawText("You Lost!", 0f, 120f, textPaint)
-        }
-    }
-
-    private fun drawFlag(canvas: Canvas?, x: Int, y: Int) {
-        val sizeOfGap = (height / gridSize);
-        val gapRect = Rect(x * sizeOfGap, y * sizeOfGap,
-            (x + 1) * sizeOfGap, (y + 1) * sizeOfGap)
-
-        canvas?.drawBitmap(flagPic, null, gapRect, null)
-    }
-
-    private fun drawMine(canvas: Canvas?, x: Int, y: Int) {
-        val sizeOfGap = (height / gridSize);
-        val gapRect = Rect(x * sizeOfGap, y * sizeOfGap,
-            (x + 1) * sizeOfGap, (y + 1) * sizeOfGap)
-
-        canvas?.drawBitmap(minePic, null, gapRect, null)
-    }
-
-    private fun drawNum(canvas: Canvas?, x: Int, y: Int, num: Short) {
-        val sizeOfGap = (height / gridSize).toFloat();
-        val sizeOfPadding = 20;
-
-        canvas?.drawText(num.toString(), x * sizeOfGap + sizeOfPadding,
-            (y + 1) * sizeOfGap - sizeOfPadding, textPaint)
+        drawCurrentState(canvas)
+        drawGameEnd(canvas)
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event?.action == MotionEvent.ACTION_DOWN) {
-            Log.d("[TOUCHEVENT]", "I touched the screen" + PugSweeperEngine.getFlagMode().toString())
-
             val touchX = event.x.toInt() / (width / gridSize)
             val touchY = event.y.toInt() / (height / gridSize)
 
@@ -161,8 +108,8 @@ class PugSweeperView(context: Context?, attrs: AttributeSet?): View(context, att
         return true
     }
 
-    fun drawEmptyBoard(canvas: Canvas?) {
-        val sizeOfGap = (height / gridSize).toFloat();
+    private fun drawEmptyBoard(canvas: Canvas?) {
+        val sizeOfGap = (height / gridSize).toFloat()
 
         // Board border
         canvas?.drawRect(0f, 0f, width.toFloat(), height.toFloat(), linePaint)
@@ -186,7 +133,56 @@ class PugSweeperView(context: Context?, attrs: AttributeSet?): View(context, att
             4 * sizeOfGap, height.toFloat(), linePaint)
     }
 
-    fun restart() {
-        invalidate()
+    private fun drawCurrentState(canvas: Canvas?) {
+        val sizeOfGap = (height / gridSize).toFloat()
+        for (i in 0 until gridSize) {
+            for (j in 0 until gridSize) {
+                when(currentState[i][j]) {
+                    PugSweeperEngine.EMPTY -> canvas?.drawRect(j * sizeOfGap, i * sizeOfGap,
+                        (j + 1) * sizeOfGap, (i + 1) * sizeOfGap, backgroundPaint)
+                    PugSweeperEngine.FLAG -> drawFlag(canvas, j, i)
+                    PugSweeperEngine.BOMB -> drawMine(canvas, j, i)
+                    PugSweeperEngine.UNREVEALED -> {}
+                    else -> drawNum(canvas, j, i, currentState[i][j])
+                }
+            }
+        }
+    }
+
+    private fun drawGameEnd(canvas: Canvas?) {
+        if(PugSweeperEngine.getEndGame()) {
+            canvas?.drawRect(0f, 0f, width.toFloat(), height.toFloat(), endBackgroundPaint)
+            if(PugSweeperEngine.getWin()) {
+                canvas?.drawText("You Won!", 50f, 400f, titlePaint)
+
+                canvas?.drawText("Made by D0EXP2, Zsófia Kecskés-Solymosi", 50f, 600f, subTitlePaint)
+                return
+            }
+            canvas?.drawText("You Lost!", 50f, 400f, titlePaint)
+        }
+    }
+
+    private fun drawFlag(canvas: Canvas?, x: Int, y: Int) {
+        val sizeOfGap = (height / gridSize)
+        val gapRect = Rect(x * sizeOfGap, y * sizeOfGap,
+            (x + 1) * sizeOfGap, (y + 1) * sizeOfGap)
+
+        canvas?.drawBitmap(flagPic, null, gapRect, null)
+    }
+
+    private fun drawMine(canvas: Canvas?, x: Int, y: Int) {
+        val sizeOfGap = (height / gridSize)
+        val gapRect = Rect(x * sizeOfGap, y * sizeOfGap,
+            (x + 1) * sizeOfGap, (y + 1) * sizeOfGap)
+
+        canvas?.drawBitmap(minePic, null, gapRect, null)
+    }
+
+    private fun drawNum(canvas: Canvas?, x: Int, y: Int, num: Short) {
+        val sizeOfGap = (height / gridSize).toFloat()
+        val sizeOfPadding = 35
+
+        canvas?.drawText(num.toString(), x * sizeOfGap + sizeOfPadding,
+            (y + 1) * sizeOfGap - sizeOfPadding, titlePaint)
     }
 }

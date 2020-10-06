@@ -14,37 +14,73 @@
                 android:orientation="vertical"
                 android:id="@+id/pugSweeperContainer">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                 <TextView
+                        android:id="@+id/textMines"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:text="REMAINING MINES"
+                        app:layout_constraintBottom_toTopOf="@+id/remainingBombTxt"
+                        app:layout_constraintEnd_toStartOf="@+id/pugButton"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:textSize="18sp" />
+
+                <TextView
+                        android:id="@+id/textTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:text="TIME"
+                        app:layout_constraintBottom_toTopOf="@+id/elapsTimeTxt"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/pugButton"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:textSize="18sp" />
+
+                <TextView
                         android:id="@+id/remainingBombTxt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textAlignment="center"
+                        android:layout_weight="3"
                         android:gravity="center_horizontal"
-                        android:textSize="24sp"
-                        android:text="Something" />
+                        android:textAlignment="center"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="34sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/pugButton"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
                 <Button
                         android:id="@+id/pugButton"
-                        android:layout_width="56dp"
-                        android:layout_height="64dp"
-                        android:background="@drawable/pug" />
+                        android:layout_width="92dp"
+                        android:layout_height="92dp"
+                        android:background="@drawable/pug"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                         android:id="@+id/elapsTimeTxt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textAlignment="center"
+                        android:layout_weight="3"
                         android:gravity="center_horizontal"
-                        android:textSize="24sp"
-                        android:text="TIME" />
-            </LinearLayout>
+                        android:text=""
+                        android:textAlignment="center"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="34sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/pugButton"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -62,12 +98,16 @@
                         android:id="@+id/flagSwitch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Switch right to place flags"
-                        android:textSize="24sp"
+                        android:text="@string/switch_text"
+                        android:textAllCaps="true"
+                        android:textSize="18sp"
+                        android:background="@drawable/back"
+                        android:textColor="@color/colorAccent"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/sweeperGameView"
+                        app:layout_constraintTop_toBottomOf="@+id/pugSweeperView"
                         app:layout_constraintVertical_bias="0.0"
-                        tools:layout_editor_absoluteX="0dp" />
+                        tools:layout_editor_absoluteX="16dp" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>

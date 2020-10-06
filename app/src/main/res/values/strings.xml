@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PugSweeper</string>
+    <string name="switch_text">Switch right to place flags!</string>
 </resources>
