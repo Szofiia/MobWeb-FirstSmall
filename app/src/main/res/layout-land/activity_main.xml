@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".MainActivity">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:id="@+id/pugSweeperContainer">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/constraintLayout"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="1.0"
+                        app:layout_constraintStart_toEndOf="@+id/pugSweeperView"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.0">
+
+                    <TextView
+                            android:id="@+id/textMines"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:gravity="center_horizontal"
+                            android:text="REMAINING MINES"
+                            android:textAlignment="center"
+                            android:textSize="18sp"
+                            app:layout_constraintEnd_toStartOf="@+id/pugButton"
+                            app:layout_constraintHorizontal_bias="0.0"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                            android:id="@+id/textTime"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:gravity="center_horizontal"
+                            android:text="TIME"
+                            android:textAlignment="center"
+                            android:textSize="18sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/pugButton"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                            android:id="@+id/remainingBombTxt"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="3"
+                            android:gravity="center_horizontal"
+                            android:textAlignment="center"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="34sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/pugButton"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/textMines" />
+
+                    <Button
+                            android:id="@+id/pugButton"
+                            android:layout_width="92dp"
+                            android:layout_height="92dp"
+                            android:background="@drawable/pug"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                            android:id="@+id/elapsTimeTxt"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="3"
+                            android:gravity="center_horizontal"
+                            android:text=""
+                            android:textAlignment="center"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="34sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/pugButton"
+                            app:layout_constraintTop_toBottomOf="@+id/textTime" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <hu.bme.aut.pugsweeper.view.PugSweeperView
+                        android:id="@+id/pugSweeperView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                <Switch
+                        android:id="@+id/flagSwitch"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/back"
+                        android:text="@string/switch_text"
+                        android:textAllCaps="true"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="18sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.0"
+                        app:layout_constraintStart_toEndOf="@+id/pugSweeperView"
+                        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
+                        app:layout_constraintVertical_bias="0.0" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
