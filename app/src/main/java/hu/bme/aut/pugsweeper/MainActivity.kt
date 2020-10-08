@@ -19,11 +19,11 @@ class MainActivity : AppCompatActivity() {
     inner class GameTimerTask : TimerTask() {
         override fun run() {
             runOnUiThread {
-                elapsedTime++
-                elapsTimeTxt.text = elapsedTime.toString()
-
                 if(elapsedTime >= 300 || PugSweeperEngine.getEndGame()) {
                     stopTimer()
+                } else {
+                    elapsedTime++
+                    elapsTimeTxt.text = elapsedTime.toString()
                 }
             }
         }
