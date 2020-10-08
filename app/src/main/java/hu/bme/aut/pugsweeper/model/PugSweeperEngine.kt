@@ -76,6 +76,10 @@ import hu.bme.aut.pugsweeper.MainActivity
 
     // Reveal field when View touch event calls
     fun revealField(x: Int, y: Int) {
+        if(isEndGame) {
+            return
+        }
+
         if(x < 0 || y < 0 || x >= gridSize || y >= gridSize) {
             return
         }

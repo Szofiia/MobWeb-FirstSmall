@@ -19,6 +19,18 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
+                <View
+                        android:id="@+id/divider3"
+                        android:layout_width="1dp"
+                        android:layout_height="90dp"
+                        android:background="?android:attr/listDivider"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/pugButton"
+                        app:layout_constraintHorizontal_bias="1.0"
+                        app:layout_constraintStart_toEndOf="@+id/remainingBombTxt"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="1.0" />
+
                 <TextView
                         android:id="@+id/textMines"
                         android:layout_width="wrap_content"
@@ -79,6 +91,18 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/pugButton"
                         app:layout_constraintTop_toTopOf="parent" />
+
+                <View
+                        android:id="@+id/divider"
+                        android:layout_width="1dp"
+                        android:layout_height="90dp"
+                        android:background="?android:attr/listDivider"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/textTime"
+                        app:layout_constraintHorizontal_bias="0.0"
+                        app:layout_constraintStart_toEndOf="@+id/pugButton"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="1.0" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
